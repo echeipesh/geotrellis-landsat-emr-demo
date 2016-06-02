@@ -15,6 +15,7 @@ import org.apache.accumulo.core.client.security.tokens._
 import org.apache.commons.io.IOUtils
 import org.apache.hadoop.fs._
 import org.apache.hadoop.conf._
+import org.apache.spark.SparkContext
 import spray.json._
 import org.joda.time._
 
@@ -54,6 +55,24 @@ case class Config (
         case None => SocketWriteStrategy()
       }
       AccumuloLayerWriter(instance, params("table"), strategy)
+  }
+
+  def updater(implicit sc: SparkContext): LayerUpdater[LayerId] = output match {
+    case "s3" =>
+      S3LayerUpdater(params("bucket"), params("prefix"))
+    case "file" =>
+      FileLayerUpdater(params("path"))
+    case "accumulo" =>
+      val zookeeper: String = params.get("zookeeper").getOrElse {
+        val conf = new Configuration // if not specified assume zookeeper is same as DFS master
+        new URI(conf.get("fs.defaultFS")).getHost
+      }
+      val instance = AccumuloInstance(params("instance"), zookeeper, params("user"), new PasswordToken(params("password")))
+      val strategy = params.get("ingestPath") match {
+        case Some(path) => HdfsWriteStrategy(path)
+        case None => SocketWriteStrategy()
+      }
+      AccumuloLayerUpdater(instance, strategy)
   }
 }
 

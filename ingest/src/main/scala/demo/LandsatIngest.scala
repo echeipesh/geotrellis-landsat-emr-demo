@@ -90,7 +90,8 @@ object LandsatIngest extends Logging {
     layerName: String,
     images: Seq[LandsatImage],
     fetchMethod: LandsatImage => ProjectedRaster[MultibandTile],
-    writer: LayerWriter[LayerId]
+    writer: LayerWriter[LayerId],
+    updater: LayerUpdater[LayerId]
   )(implicit sc: SparkContext): Unit = {
     // Our dataset can span UTM zones, we must reproject the tiles individually to common projection
     val maxZoom = 13 // We know this ahead of time based on Landsat resolution
@@ -104,7 +105,11 @@ object LandsatIngest extends Logging {
     val rdd = new ContextRDD(tiledRdd, tileLayerMetadata)
 
     Pyramid.upLevels(rdd, layoutScheme, maxZoom, 1, resampleMethod){ (rdd, zoom) =>
-      writer.write(LayerId(layerName, zoom), rdd, ZCurveKeyIndexMethod.byDay)
+      val layerId = LayerId(layerName, zoom)
+      if (writer.attributeStore.layerExists(layerId))
+        updater.update(layerId, rdd)
+      else
+        writer.write(layerId, rdd, ZCurveKeyIndexMethod.byDay)
 
       if (zoom == 1) {
         // Store attributes common across zooms for catalog to see
@@ -158,7 +163,8 @@ object LandsatIngestMain extends Logging {
         layerName = config.layerName,
         images = config.limit.fold(images)(images.take(_)),
         fetchMethod = _.getRasterFromS3(bandsWanted = bandsWanted, hook = config.cacheHook),
-        writer = config.writer)
+        writer = config.writer,
+        updater = config.updater)
     } finally {
       sc.stop()
     }
