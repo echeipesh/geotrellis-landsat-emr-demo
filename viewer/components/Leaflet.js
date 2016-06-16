@@ -104,6 +104,8 @@ var Leaflet = React.createClass({
       fillOpacity: 0.15,
       fillColor: null // falls back on stroke color
     }
+    var ndwiOpts = polyOptions
+    ndwiOpts['color'] = 'blue';
 
     console.log(vectorLayers);
 
@@ -121,8 +123,8 @@ var Leaflet = React.createClass({
               line: false,
               polyline: false,
               circle: false,
-              rectangle: { shapeOptions: polyOptions },
-              polygon: { shapeOptions: polyOptions },
+              rectangle: false,
+              polygon: { shapeOptions: ndwiOpts },
               marker: true
             }}
           />

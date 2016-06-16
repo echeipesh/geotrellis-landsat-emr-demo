@@ -1,4 +1,4 @@
-package geotrellis.admin.server.util
+package demo
 
 import spray.http.{HttpMethods, HttpMethod, HttpResponse, AllOrigins}
 import spray.http.HttpHeaders._
@@ -29,3 +29,4 @@ trait CORSSupport { this: HttpService =>
     }
   }
 }
+

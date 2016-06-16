@@ -96,7 +96,7 @@ var SingleLayer = React.createClass({
 
     let layerTimes =
       _.map(_.get(layer, "times", []), (time, index) => {
-        return <option value={time} key={index}>{time}</option>;
+        return <option value={index} key={index}>{time}</option>;
       });
 
 
