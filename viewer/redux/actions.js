@@ -1,39 +1,16 @@
 import fetch from 'isomorphic-fetch';
-import shortid from 'shortid';
-import timeSeries from '../charts/timeSeries.js'
+
+var showLayer = function (url, layerId) {
+  return {
+    type: 'SHOW_LAYER',
+    url: url
+  };
+};
 
 var actions = {
-  setLayerType: function(layerType) {
-    return {
-      type: 'SET_LAYER_TYPE',
-      layerType: layerType
-    };
-  },
-  registerTime: function(time, index) {
-    return {
-      type: 'REGISTER_TIME',
-      time: time,
-      index: index
-    };
-  },
-  setIndexType: function(ndi) {
-    return {
-      type: 'SET_NDI',
-      ndi: ndi
-    };
-  },
-  setLayerName: function(layerName) {
-    return {
-      type: 'SET_LAYERNAME',
-      name: layerName
-    };
-  },
-  showLayer: function (url) {
-    return {
-      type: 'SHOW_LAYER',
-      url: url
-    };
-  },
+
+  showLayer: showLayer,
+
   centerMap: function (extent) {
     return {
       type: 'CENTER_MAP',
@@ -55,6 +32,7 @@ var actions = {
       url: url
     };
   },
+
   loadCatalogSuccess: function(url, catalog) {
     return {
       type: 'LOAD_CATALOG_SUCCESS',
@@ -62,6 +40,7 @@ var actions = {
       catalog: catalog
     };
   },
+
   loadCatalogFailure: function(url, error) {
     return {
       type: 'LOAD_CATALOG_ERROR',
@@ -69,22 +48,22 @@ var actions = {
       error: error
     };
   },
+
   fetchCatalog: function (url) {
     return dispatch => {
       dispatch(actions.loadCatalogRequest(url));
       console.log("FETCH CATALOG", url + "/catalog");
-      return fetch(url + "/catalog").then( response => {
-        response.json().then( json => {
-          dispatch(actions.loadCatalogSuccess(url, json));
-        });
-      },
-      error => dispatch(actions.loadCatalogFailure(url, error)));
+      return fetch(url + "/catalog")
+        .then(
+          response => {
+            response.json().then( json => {
+              dispatch(actions.loadCatalogSuccess(url, json));
+            });
+          },
+          error => dispatch(actions.loadCatalogFailure(url, error))
+        );
     };
   },
-  fetchPolygonalSummary: function(polygonLayer, url, indexType) {
-    // type should be NDVI or NDWI
-    // answer should be the computed mean value
-    let singlePolySummaryTemplate = _.template("Average <%- type %>: <%- answer %>");
 
     return dispatch => {
       console.log("Fetching polygonal summary", polygonLayer.toGeoJSON().geometry);
@@ -126,13 +105,16 @@ var actions = {
   showLayerWithBreaks: function(layerUrl, breaksUrl, layerId) {
     return dispatch => {
       console.log("Fetching breaks", breaksUrl);
-      return fetch(breaksUrl).then( response => {
-        response.json().then( breaks => {
-          dispatch(actions.showLayer(layerUrl + "&breaks=" + breaks.join(","), layerId));
-        });
-      },
-      error => {});
-    };
+      return fetch(breaksUrl)
+        .then(
+          response => {
+            response.json().then( breaks => {
+              dispatch(actions.showLayer(layerUrl + "&breaks=" + breaks.join(","), layerId));
+            });
+          },
+          error => {}
+        );
+      };
   },
   showMaxState: function(url) {
     return dispatch => {
