@@ -52,14 +52,18 @@ var MapViews = React.createClass({
   },
   updateState: function(target, value) {
     let newState = _.merge({}, this.state, {[target]: value});
-    console.log("UPDATE STATE, NEW ", newState);
     this.setState(newState);
     this.updateMap(newState);
   },
   updateMap: function (state) {
     if (! state) {state = this.state; }
-    ifAllDefined(this.props.showLayerWithBreaks, this.props.showLayer, this.props.rootUrl, state.operation, this.props.layers[state.layerId], state.timeId1, state.timeId2)
-      (updateIntraLayerDiffMap);
+    ifAllDefined(this.props.showLayerWithBreaks,
+                 this.props.showLayer,
+                 this.props.rootUrl,
+                 state.operation,
+                 this.props.layers[state.layerId],
+                 state.timeId1,
+                 state.timeId2)(updateIntraLayerDiffMap);
     this.props.showExtent(this.props.layers[state.layerId].extent);
   },
   componentWillReceiveProps: function (nextProps){

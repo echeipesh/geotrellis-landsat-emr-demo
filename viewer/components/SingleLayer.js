@@ -16,7 +16,6 @@ function updateSingleLayerMap (showLayerWithBreaks, showLayer, root, op, layer, 
       `${root}/tiles/breaks/${layer.name}?time=${time1}`
     );
   }
-
 };
 
 var SingleLayer = React.createClass({
@@ -37,7 +36,7 @@ var SingleLayer = React.createClass({
     let newState = _.merge({}, this.state, {
       "layerId": layerId,
       "time": _.get(this.state.times[layerId], "time", undefined),
-      "times": { // Saves time selectio when switching layer
+      "times": { // Saves time selection when switching layer
         [this.state.layerId]: {
           "time": this.state.time
         }
@@ -45,6 +44,8 @@ var SingleLayer = React.createClass({
     });
 
     this.setState(newState);
+    this.props.setLayerName(this.props.layers[layerId])
+    this.props.registerTime(this.state.time, 0)
     this.updateMap(newState);
     this.props.showExtent(this.props.layers[layerId].extent);
   },
@@ -58,8 +59,14 @@ var SingleLayer = React.createClass({
   },
   updateMap: function (state) {
     if (! state) { state = this.state; }
-    ifAllDefined(this.props.showLayerWithBreaks, this.props.showLayer, this.props.rootUrl, state.operation, this.props.layers[state.layerId], state.timeId)
-      (updateSingleLayerMap);
+    ifAllDefined(
+      this.props.showLayerWithBreaks,
+      this.props.showLayer,
+      this.props.rootUrl,
+      state.operation,
+      this.props.layers[state.layerId],
+      state.timeId
+    )(updateSingleLayerMap);
     this.props.showExtent(this.props.layers[state.layerId].extent);
   },
   componentWillReceiveProps: function (nextProps){
@@ -68,9 +75,13 @@ var SingleLayer = React.createClass({
     if ( _.isUndefined(this.state.layerId) && ! _.isEmpty(nextProps.layers)) {
       // we are blank and now is our chance to choose a layer and some times
       let newState = _.merge({}, this.state, { layerId: 0, timeId: 0 });
+      let layer = nextProps.layers[0];
       this.setState(newState);
-      var layer = nextProps.layers[0];
-      updateSingleLayerMap(nextProps.showLayerWithBreaks, nextProps.showLayer, nextProps.rootUrl, this.state.operation, layer, 0);
+      updateSingleLayerMap(nextProps.showLayerWithBreaks,
+                           nextProps.showLayer,
+                           nextProps.rootUrl,
+                           this.state.operation,
+                           layer, 0);
       nextProps.showExtent(layer.extent);
     }
   },
@@ -80,13 +91,14 @@ var SingleLayer = React.createClass({
 
     let layerOptions =
       _.map(this.props.layers, (layer, index) => {
-        return <option value={index} key={index}>{layer.name}</option>;
+        return <option value={layer.name} key={index}>{layer.name}</option>;
       });
 
     let layerTimes =
       _.map(_.get(layer, "times", []), (time, index) => {
-        return <option value={index} key={index}>{time}</option>;
+        return <option value={time} key={index}>{time}</option>;
       });
+
 
     return (
       <div>
@@ -96,7 +108,7 @@ var SingleLayer = React.createClass({
         </Input>
 
         <Input type="select" label="Time" placeholder="select" value={this.state.timeId}
-            onChange={e => this.handleTimeSelect(e, layer)}>//this.updateState("timeId", +e.target.key)}>
+            onChange={e => this.handleTimeSelect(e, layer)}>
           {layerTimes}
         </Input>
 
