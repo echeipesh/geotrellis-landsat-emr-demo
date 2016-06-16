@@ -28,9 +28,9 @@ var MapViews = React.createClass({
       times: {}
     };
   },
-  handleTimeSelect: function(ev, index) {
+  handleTimeSelect: function(ev, layer, index) {
     this.updateState("timeId" + index, +ev.target.value);
-    this.props.registerTime(_.get(this.props.layers[this.state.layerId], "times", [])[this.state.timeId], 1);
+    this.props.registerTime(currentLayer.times[ev.target.value], index);
   },
   handleLayerSelect: function(ev) {
     let layerId = +ev.target.value;
@@ -101,12 +101,12 @@ var MapViews = React.createClass({
         </Input>
 
         <Input type="select" label="Time A" placeholder="select" value={this.state.timeId1}
-            onChange={e => this.handleTimeSelect(+e.target.value, 1)}>
+            onChange={ev => this.handleTimeSelect(ev, layer, 1)}>
           {layerTimes}
         </Input>
 
         <Input type="select" label="Time B" placeholder="select" value={this.state.timeId2}
-            onChange={e => this.handleTimeSelect(+e.target.value, 2)}>
+            onChange={ev => this.handleTimeSelect(ev, layer, 2)}>
           {layerTimes}
         </Input>
 

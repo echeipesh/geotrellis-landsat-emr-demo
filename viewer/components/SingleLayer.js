@@ -27,9 +27,9 @@ var SingleLayer = React.createClass({
       times: {}           // maps from layerId => {timeId1 , timeId2}
     };
   },
-  handleTimeSelect: function(ev) {
+  handleTimeSelect: function(ev, currentLayer) {
     this.updateState("timeId", +ev.target.value);
-    this.props.registerTime(_.get(this.props.layers[this.state.layerId], "times", [])[this.state.timeId], 1);
+    this.props.registerTime(currentLayer.times[ev.target.value], 1);
   },
   handleLayerSelect: function(ev) {
     let layerId = +ev.target.value;
@@ -96,7 +96,7 @@ var SingleLayer = React.createClass({
 
     let layerTimes =
       _.map(_.get(layer, "times", []), (time, index) => {
-        return <option value={time} key={index}>{time}</option>;
+        return <option value={index} key={index}>{time}</option>;
       });
 
 
@@ -108,7 +108,7 @@ var SingleLayer = React.createClass({
         </Input>
 
         <Input type="select" label="Time" placeholder="select" value={this.state.timeId}
-            onChange={e => this.handleTimeSelect(e)}>//this.updateState("timeId", +e.target.key)}>
+            onChange={e => this.handleTimeSelect(e, layer)}>//this.updateState("timeId", +e.target.key)}>
           {layerTimes}
         </Input>
 
@@ -118,9 +118,9 @@ var SingleLayer = React.createClass({
                defaultValue={isLandsat ? this.state.bandOp : "none"}
                disabled={!isLandsat}
                onChange={e => this.updateState("operation", e.target.value)} >
-          <option defaultValue="none">View</option>
-          <option defaultValue="ndvi">NDVI</option>
-          <option defaultValue="ndwi">NDWI</option>
+          <option value="none">View</option>
+          <option value="ndvi">NDVI</option>
+          <option value="ndwi">NDWI</option>
         </Input>
       </div>
     )

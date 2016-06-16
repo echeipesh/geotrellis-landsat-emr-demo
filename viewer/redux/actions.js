@@ -87,7 +87,7 @@ var actions = {
     let singlePolySummaryTemplate = _.template("Average <%- type %>: <%- answer %>");
 
     return dispatch => {
-      console.log("Fetching polygonal summary", polygonLayer.toGeoJSON());
+      console.log("Fetching polygonal summary", polygonLayer.toGeoJSON().geometry);
       return fetch(url, {
         method: 'POST',
         body: JSON.stringify(polygonLayer.toGeoJSON().geometry)
@@ -103,7 +103,7 @@ var actions = {
   },
   fetchTimeSeries: function(pointLayer, url) {
     return dispatch => {
-      console.log("Fetching timeseries data", pointLayer.toGeoJSON());
+      console.log("Fetching timeseries data", pointLayer.toGeoJSON().geometry);
       var chartID = shortid.generate();
       return fetch(url).then( response => {
         response.json().then( summary => {
