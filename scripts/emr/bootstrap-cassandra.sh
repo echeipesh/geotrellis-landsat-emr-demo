@@ -37,4 +37,4 @@ sudo mkdir -p /mnt2/cassandra
 sudo docker run --name=cassandra -d --net=host \
      -v /mnt2/cassandra:/var/lib/cassandra \
      -e CASSANDRA_SEEDS=${MASTER_IP} \
-     cassandra:2
+     daunnc/cassandra:2.2

@@ -4,22 +4,19 @@ import geotrellis.raster._
 import geotrellis.raster.io.geotiff._
 import geotrellis.raster.render._
 import geotrellis.raster.resample._
-
 import geotrellis.spark._
 import geotrellis.spark.io._
 import geotrellis.spark.io.file._
 import geotrellis.spark.io.s3._
 import geotrellis.spark.io.accumulo._
+import geotrellis.spark.io.cassandra._
 import geotrellis.spark.io.avro._
 import geotrellis.spark.io.avro.codecs._
 import geotrellis.spark.io.json._
 import geotrellis.spark.io.index._
-
 import org.apache.spark._
 import org.apache.avro.Schema
-
 import org.apache.accumulo.core.client.security.tokens._
-
 import com.github.nscala_time.time.Imports._
 import akka.actor._
 import akka.io.IO
@@ -29,7 +26,6 @@ import spray.routing.directives.CachingDirectives
 import spray.http.MediaTypes
 import spray.json._
 import spray.json.DefaultJsonProtocol._
-
 import com.typesafe.config.ConfigFactory
 
 import scala.concurrent._
@@ -96,6 +92,12 @@ object Main {
         val instance = AccumuloInstance(instanceName, zooKeeper, user, password)
 
         new AccumuloReaderSet(instance)
+      } else if(args(0) == "cassandra") {
+        val zooKeeper = args(1).split(",")
+        val master = args(2)
+        val instance = BaseCassandraInstance(zooKeeper, master)
+
+        new CassandraReaderSet(instance)
       } else {
         sys.error(s"Unknown catalog type ${args(0)}")
       }
