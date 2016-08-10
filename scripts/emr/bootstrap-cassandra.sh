@@ -33,8 +33,8 @@ fi
 
 MASTER_IP=$(xmllint --xpath "//property[name='yarn.resourcemanager.hostname']/value/text()"  /etc/hadoop/conf/yarn-site.xml)
 
-sudo mkdir -p /mnt/cassandra
+sudo mkdir -p /mnt2/cassandra
 sudo docker run --name=cassandra -d --net=host \
-     -v /mnt/cassandra:/var/lib/cassandra \
+     -v /mnt2/cassandra:/var/lib/cassandra \
      -e CASSANDRA_SEEDS=${MASTER_IP} \
-     cassandra:2
+     daunnc/cassandra:2.2
